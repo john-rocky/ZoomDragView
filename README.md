@@ -2,6 +2,8 @@
 
 View that zooms the touched point to enable fine dragging.
 
+![Jun-14-2023 12-46-29](https://github.com/john-rocky/PersonSegmentationSampler/assets/23278992/0e098ed7-54b6-45b6-96a4-f28b87f661b0)
+
 ### Usage
 
 ```
