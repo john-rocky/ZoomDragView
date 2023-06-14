@@ -37,6 +37,7 @@ public class ZoomDragView: UIView {
     public var backgroundImageColor = UIColor.white
     public var image: UIImage? {
         didSet {
+            guard let image = image else {return}
             imageView.image = image
             imageView.contentMode = .scaleAspectFill
             let imageSize = image!.size
