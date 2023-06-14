@@ -123,7 +123,7 @@ public class ZoomDragView: UIView {
         touchingAction(touches: touches)
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchingAction(touches: touches)
     }
     
