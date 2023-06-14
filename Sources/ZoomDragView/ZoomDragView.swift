@@ -16,7 +16,7 @@ public class ZoomDragView: UIView {
         }
     }
 
-    override var backgroundColor: UIColor? {
+    public override var backgroundColor: UIColor? {
         didSet {
             if let backgroundColor = backgroundColor {
                 backgroundImageColor = backgroundColor
@@ -73,7 +73,7 @@ public class ZoomDragView: UIView {
         super.init(coder: coder)
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         guard let touch = touches.first else { return }
         if !moving {
@@ -117,7 +117,7 @@ public class ZoomDragView: UIView {
         
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         zoomView.isHidden = true
         touchPointView.isHidden = true
     }
