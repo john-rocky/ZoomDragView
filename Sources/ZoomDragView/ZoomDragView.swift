@@ -60,7 +60,7 @@ public class ZoomDragView: UIView {
     var moving = false
     var blackImage:UIImage!
 
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         self.touchPointColor = .red
         self.backgroundColor = .clear
