@@ -40,7 +40,7 @@ public class ZoomDragView: UIView {
             guard let image = image else {return}
             imageView.image = image
             imageView.contentMode = .scaleAspectFill
-            let imageSize = image!.size
+            let imageSize = image.size
             let aspect = imageSize.height/imageSize.width
             let imageViewHeight = self.bounds.width * aspect
             imageView.frame = CGRect(x: 0, y: self.center.y - imageViewHeight / 2, width: self.bounds.width, height: imageViewHeight)
