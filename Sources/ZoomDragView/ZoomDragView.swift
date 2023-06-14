@@ -8,7 +8,13 @@
 import UIKit
 
 public class ZoomDragView: UIView {
-    public var zoomScale:CGFloat = 2
+    public var zoomScale:CGFloat! {
+        didSet {
+            scale = 0.4/zoomScale
+        }
+    }
+    var scale = 0.2
+
     var touchPointView = PointView()
     public var touchPointColor:UIColor? {
         didSet {
@@ -62,6 +68,7 @@ public class ZoomDragView: UIView {
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
+        self.zoomScale = 2
         self.touchPointColor = .red
         self.backgroundColor = .clear
         self.addSubview(imageView)
@@ -73,48 +80,51 @@ public class ZoomDragView: UIView {
         super.init(coder: coder)
     }
     
-    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
+    func touchingAction(touches: Set<UITouch>) {
         guard let touch = touches.first else { return }
         if !moving {
             moving = true
-            let location = touch.location(in: imageView)
-            touchPointView.isHidden = false
-            touchPointView.center = location
-            if location.x < imageView.center.x {
-                zoomView.frame = zoomViewFrameRight
-            } else {
-                zoomView.frame = zoomViewFrameLeft
-            }
-            
-            zoomView.isHidden = false
-            let imageSize = imageView.image!.size
-            let normalizedLocation = CGPoint(x: location.x/imageView.bounds.width, y: location.y/imageView.bounds.height)
-            let locationInImage = CGPoint(x:normalizedLocation.x * imageSize.width,y: normalizedLocation.y * imageSize.height)
-            var croppedImage:UIImage!
-            var scale = 0.4/zoomScale
-            var cropRect = CGRect(x: locationInImage.x-imageSize.width*(scale/2), y: locationInImage.y-imageSize.width*(scale/2), width: imageSize.width*scale, height: imageSize.width*scale)
-            if cropRect.minX < 0 || cropRect.maxX > image!.size.width || cropRect.minY < 0 || cropRect.maxY > image!.size.height {
-                cropRect = CGRect(x: locationInImage.x+(blackImage.size.width-imageSize.width*(scale/2)-imageSize.width)/2, y: locationInImage.y+(blackImage.size.height-imageSize.height*(scale/2)-imageSize.height)/2, width: imageSize.width*scale, height: imageSize.width*scale)
-                
-                let compositeImage = blackImage.composite(image: image!)
-                print(compositeImage?.scale)
-                croppedImage = compositeImage!.crop(cropRect: cropRect)
-            } else {
-                croppedImage = image!.crop(cropRect: cropRect)
-            }
-            let circleInZoomImage = 0.025/0.4
-            if let touchPointColor = touchPointColor {
-                guard let zoomCircleImage = croppedImage?.drawCircleInImageCenter(normalizedCircleWidth: circleInZoomImage,touchPointColor: touchPointColor) else {moving = false;return}
-                zoomView.image = zoomCircleImage
-            } else {
-                zoomView.image = croppedImage
-            }
-            moving = false
+        let location = touch.location(in: imageView)
+        touchPointView.isHidden = false
+        touchPointView.center = location
+        if location.x < imageView.center.x {
+            zoomView.frame = zoomViewFrameRight
+        } else {
+            zoomView.frame = zoomViewFrameLeft
         }
         
-        
-        
+        zoomView.isHidden = false
+        let imageSize = imageView.image!.size
+        let normalizedLocation = CGPoint(x: location.x/imageView.bounds.width, y: location.y/imageView.bounds.height)
+        let locationInImage = CGPoint(x:normalizedLocation.x * imageSize.width,y: normalizedLocation.y * imageSize.height)
+        var croppedImage:UIImage!
+        var cropRect = CGRect(x: locationInImage.x-imageSize.width*(scale/2), y: locationInImage.y-imageSize.width*(scale/2), width: imageSize.width*scale, height: imageSize.width*scale)
+        if cropRect.minX < 0 || cropRect.maxX > image!.size.width || cropRect.minY < 0 || cropRect.maxY > image!.size.height {
+            cropRect = CGRect(x: locationInImage.x+(blackImage.size.width-imageSize.width*(scale/2)-imageSize.width)/2, y: locationInImage.y+(blackImage.size.height-imageSize.height*(scale/2)-imageSize.height)/2, width: imageSize.width*scale, height: imageSize.width*scale)
+            
+            let compositeImage = blackImage.composite(image: image!)
+            print(compositeImage?.scale)
+            croppedImage = compositeImage!.crop(cropRect: cropRect)
+        } else {
+            croppedImage = image!.crop(cropRect: cropRect)
+        }
+        let circleInZoomImage = 0.025/0.4
+        if let touchPointColor = touchPointColor {
+            guard let zoomCircleImage = croppedImage?.drawCircleInImageCenter(normalizedCircleWidth: circleInZoomImage,touchPointColor: touchPointColor) else {moving = false;return}
+            zoomView.image = zoomCircleImage
+        } else {
+            zoomView.image = croppedImage
+        }
+        moving = false
+        }
+    }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchingAction(touches: touches)
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchingAction(touches: touches)
     }
     
     public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -146,11 +156,6 @@ public extension UIImage {
   }
     
     func composite(image:UIImage) -> UIImage? {
-        print(image.cgImage?.height)
-        print(self.cgImage?.height)
-        print(image.size.height)
-        print(self.size.height)
-
         UIGraphicsBeginImageContextWithOptions(self.size, false, 1)
         self.draw(in: CGRect(origin: CGPoint.zero, size: self.size))
         let frontRect = CGRect(x: (self.size.width-image.size.width)/2, y:  (self.size.height-image.size.height)/2, width: image.size.width, height: image.size.height)
