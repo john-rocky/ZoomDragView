@@ -83,6 +83,7 @@ public class ZoomDragView: UIView {
     
     func touchingAction(touches: Set<UITouch>) {
         guard let touch = touches.first else { return }
+        guard let image = image else {return}
         if !moving {
             moving = true
         let location = touch.location(in: imageView)
@@ -95,19 +96,18 @@ public class ZoomDragView: UIView {
         }
         
         zoomView.isHidden = false
-        let imageSize = imageView.image!.size
+        let imageSize = image.size
         let normalizedLocation = CGPoint(x: location.x/imageView.bounds.width, y: location.y/imageView.bounds.height)
         let locationInImage = CGPoint(x:normalizedLocation.x * imageSize.width,y: normalizedLocation.y * imageSize.height)
         var croppedImage:UIImage!
         var cropRect = CGRect(x: locationInImage.x-imageSize.width*(scale/2), y: locationInImage.y-imageSize.width*(scale/2), width: imageSize.width*scale, height: imageSize.width*scale)
-        if cropRect.minX < 0 || cropRect.maxX > image!.size.width || cropRect.minY < 0 || cropRect.maxY > image!.size.height {
+        if cropRect.minX < 0 || cropRect.maxX > image.size.width || cropRect.minY < 0 || cropRect.maxY > image.size.height {
             cropRect = CGRect(x: locationInImage.x+(blackImage.size.width-imageSize.width*(scale/2)-imageSize.width)/2, y: locationInImage.y+(blackImage.size.height-imageSize.height*(scale/2)-imageSize.height)/2, width: imageSize.width*scale, height: imageSize.width*scale)
             
-            let compositeImage = blackImage.composite(image: image!)
-            print(compositeImage?.scale)
+            let compositeImage = blackImage.composite(image: image)
             croppedImage = compositeImage!.crop(cropRect: cropRect)
         } else {
-            croppedImage = image!.crop(cropRect: cropRect)
+            croppedImage = image.crop(cropRect: cropRect)
         }
         let circleInZoomImage = 0.025/0.4
         if let touchPointColor = touchPointColor {
